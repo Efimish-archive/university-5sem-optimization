@@ -13,7 +13,7 @@ def bitwise(a, b, epsilon=1e-3):
     steps += 1
     if not (a <= x1 <= b):
       if abs(h) <= epsilon:
-        print(f"За {steps} операций мы нашли f({x1})={fx1}")
+        print(f"За {steps} операций мы нашли f({x0})={fx0}")
         break
       else:
         h = -h/4
@@ -27,7 +27,7 @@ def bitwise(a, b, epsilon=1e-3):
       x0 = x1
     else:
       if abs(h) <= epsilon:
-        print(f"За {steps} операций мы нашли f({x1})={fx1}")
+        print(f"За {steps} операций мы нашли f({x0})={fx0}")
         break
       else:
         x0 = x1
