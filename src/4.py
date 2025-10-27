@@ -12,8 +12,8 @@ def f_(value):
   expr = expr.subs(x, value)
   return expr.evalf()
 
-# Метод секущих
 def secant(a, b, epsilon=1e-3):
+  "Метод секущих"
   steps = 0
   x0 = a
   x1 = b
