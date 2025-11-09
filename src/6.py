@@ -1,5 +1,5 @@
 import math
-import sympy
+import sympy as sp
 import numpy as np
 
 def f(x):
@@ -7,9 +7,9 @@ def f(x):
 
 def f_(value):
   "Производная f'(x)"
-  x = sympy.symbols('x')
-  expr = -1*sympy.sqrt(20*x - x**2) + 0.01*sympy.sin(x)
-  expr = sympy.diff(expr)
+  x = sp.symbols('x')
+  expr = -1*sp.sqrt(20*x - x**2) + 0.01*sp.sin(x)
+  expr = sp.diff(expr)
   expr = expr.subs(x, value)
   return expr.evalf()
 
@@ -17,7 +17,7 @@ def lipschitz(a, b, n):
   "Константа Липшица"
   points = np.linspace(a, b, n)
   derivatives = [f_(x) for x in points]
-  return np.max(np.abs(derivatives))
+  return float(np.max(np.abs(derivatives)))
 
 a = 9
 b = 11
@@ -25,36 +25,52 @@ epsilon = 0.015
 n = math.ceil((b - a) / epsilon)
 L = lipschitz(a, b, n)
 
-def bruteforce(a, b, epsilon, n):
+print(f"a={a}, b={b}, epsilon={epsilon}, n={n}, L={L}")
+
+def bruteforce(a, b, n):
   "Метод равномерного перебора"
-  points = [a + i*epsilon for i in range(n)]
+  h = 2*epsilon / L
+  print(f"h={h}")
+  points = np.linspace(a+h/2, b-h/2, n)
   values = [f(i) for i in points]
   min_value = min(values)
   min_index = values.index(min_value)
-  return points[min_index]
+  return points[min_index].item(), min_value
 
-def broken_lines(a, b, epsilon, n, L):
+def broken_lines(a, b, epsilon, L):
   "Метод ломаных"
-  # Шаг 2
+  pairs: list[tuple[float, float]] = []
+
   x0 = (1/(2*L)) * (f(a) - f(b) + L*(a+b))
   y0 = (1/2) * (f(a) + f(b) + L*(a-b))
-  phi_min = y0
-  # Шаг 3
-  while True:
-    delta = (1/(2*L)) * (f(x0) - phi_min)
-    # Шаг 4
-    if 2*L*delta < epsilon:
-      return x0 # -> x_min
-    # Шаг 5
-    x1L = x0 - delta
-    x1R = x0 + delta
-    phi = (1/2) * (f(x0) + phi_min)
-    # Шаг 6
-    if f(x1L) < f(x1R):
-      x0 = x1L
-    else:
-      x0 = x1R
-    phi_min = phi
+  pairs.append((x0, y0))
 
-print(bruteforce(a, b, epsilon, n))
-print(broken_lines(a, b, epsilon, n, L))
+  iterations = 1
+  while iterations <= 1000:
+    print()
+    print(f"Итерация {iterations}:")
+    min_index = min(range(len(pairs)), key=lambda i: pairs[i][1])
+    x_start, p_start = pairs.pop(min_index)
+    print(f"Выбранная пара: ({x_start}, {p_start})")
+
+    f_start = f(x_start)
+    delta = (1/(2*L)) * (f_start - p_start)
+    x1 = x_start - delta
+    x2 = x_start + delta
+    p_new = (1/2) * (f_start + p_start)
+
+    if 2*L*delta <= epsilon:
+      print("Окончание поиска")
+      return x_start, f_start
+
+    pairs.append((x1, p_new))
+    pairs.append((x2, p_new))
+    print(f'Множество пар: {pairs}')
+
+    iterations += 1
+  print("Достигнуто максимальное количество итераций")
+  return x_start, f(x_start)
+
+
+print("Метод равномерного перебора:", bruteforce(a, b, n))
+print("Метод ломаных:", broken_lines(a, b, epsilon, L))
