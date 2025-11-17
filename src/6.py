@@ -19,8 +19,8 @@ def lipschitz(a, b, n):
   derivatives = [f_(x) for x in points]
   return float(np.max(np.abs(derivatives)))
 
-a = 9
-b = 11
+a = 9  # a > 0
+b = 10 # b < 20
 epsilon = 0.015
 n = math.ceil((b - a) / epsilon)
 L = lipschitz(a, b, n)
