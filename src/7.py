@@ -6,59 +6,35 @@ x = sp.Symbol('x')
 f = sp.sqrt(x**2 + 5) / (2*x + 3)
 f = sp.lambdify(x, f, 'math')
 
-def golden_ratio_mod(a, b, epsilon=1e-3):
-  "Модифицированный метод золотого сечения"
+def golden_ratio(a, b, epsilon=1e-3):
+  "Метод золотого сечения"
   alpha = a + (3 - math.sqrt(5)) / 2 * (b-a)
   beta = a + (math.sqrt(5) - 1) / 2 * (b-a)
   f_alpha = f(alpha)
   f_beta = f(beta)
-  # Проверяем тройку (a, x_left, x_right)
-  if a < alpha < beta:
-    if f(a) >= f_alpha <= f_beta:
-      return a, alpha, beta
-  # Проверяем тройку (x_left, x_right, b)
-  if alpha < beta < b:
-    if f_alpha >= f_beta <= f(b):
-      return alpha, beta, b
-  # Делаем шаг золотого сечения
-  if f_alpha <= f_beta:
-    # <--- b
-    b = beta
-    beta = alpha
-    alpha = a + b - alpha
-  else:
-    # a --->
-    a = alpha
-    alpha = beta
-    beta = a + b - beta
 
-# def golden_ratio(a, b, epsilon=1e-3):
-#   "Метод золотого сечения"
-#   alpha = a + (3 - math.sqrt(5)) / 2 * (b-a)
-#   beta = a + (math.sqrt(5) - 1) / 2 * (b-a)
-#   while True:
-#     if f(alpha) <= f(beta):
-#       b = beta
-#       alpha_next = a + b - alpha
-#       beta_next = alpha
-#     else:
-#       a = alpha
-#       alpha_next = beta
-#       beta_next = a + b - beta
-#     if b - a <= epsilon:
-#       return a, (a+b)/2, b
-#     alpha = alpha_next
-#     beta = beta_next
-
-# def golden_ratio_step(a, b):
-#   "Один шаг методом золотого сечения"
-#   alpha = a + (3 - math.sqrt(5)) / 2 * (b-a)
-#   beta = a + (math.sqrt(5) - 1) / 2 * (b-a)
-#   if f(alpha) <= f(beta):
-#     b = beta
-#   else:
-#     a = alpha
-#   return a, (a+b)/2, b
+  while abs(b - a) > epsilon:
+    # Проверяем тройку (a, x_left, x_right)
+    if a < alpha < beta:
+      if f(a) >= f_alpha <= f_beta:
+        return a, alpha, beta
+    # Проверяем тройку (x_left, x_right, b)
+    if alpha < beta < b:
+      if f_alpha >= f_beta <= f(b):
+        return alpha, beta, b
+    # Делаем шаг золотого сечения
+    if f_alpha <= f_beta:
+      # <--- b
+      b = beta
+      beta = alpha
+      alpha = a + b - alpha
+    else:
+      # a --->
+      a = alpha
+      alpha = beta
+      beta = a + b - beta
+    f_alpha = f(alpha)
+    f_beta = f(beta)
 
 def parabolic(a, b, epsilon=1e-3):
   "Метод парабол"
@@ -68,7 +44,8 @@ def parabolic(a, b, epsilon=1e-3):
 
   if not (x1 < x2 < x3 and f1 >= f2 <= f3) :
     print('Неравенство 2.9 не выполнитось, используем метод золотого сечения')
-    x1, x2, x3 = golden_ratio_mod(a, b, epsilon)
+    # Снизим точность
+    x1, x2, x3 = golden_ratio(a, b, epsilon*10)
 
   while True:
     f1, f2, f3 = f(x1), f(x2), f(x3)
@@ -122,3 +99,4 @@ b = 4
 epsilon = 1e-3
 
 parabolic(a, b, epsilon)
+# Если указать b = 3, будет ошибка золотого сечения
