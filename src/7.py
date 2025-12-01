@@ -35,6 +35,8 @@ def golden_ratio(a, b, epsilon=1e-3):
       beta = a + b - beta
     f_alpha = f(alpha)
     f_beta = f(beta)
+  print("На заданном отрезке функция монотонна, пораболу найти нельзя")
+  exit()
 
 def parabolic(a, b, epsilon=1e-3):
   "Метод парабол"
@@ -42,7 +44,7 @@ def parabolic(a, b, epsilon=1e-3):
   f1, f2, f3 = f(x1), f(x2), f(x3)
   k = 1
 
-  if not (x1 < x2 < x3 and f1 >= f2 <= f3) :
+  if not (x1 < x2 < x3 and f1 >= f2 <= f3):
     print('Неравенство 2.9 не выполнитось, используем метод золотого сечения')
     # Снизим точность
     x1, x2, x3 = golden_ratio(a, b, epsilon*10)
@@ -99,4 +101,3 @@ b = 4
 epsilon = 1e-3
 
 parabolic(a, b, epsilon)
-# Если указать b = 3, будет ошибка золотого сечения
