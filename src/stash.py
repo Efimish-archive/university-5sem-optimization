@@ -6,7 +6,7 @@ x = sp.Symbol('x')
 f = sp.sqrt(x**2 + 5) / (2*x + 3)
 f = sp.lambdify(x, f, 'math')
 
-def golden_ratio(a, b, epsilon=1e-3):
+def golden_ratio(f, a=-20, b=20, epsilon=1e-3):
   "Метод золотого сечения"
   alpha = a + (3 - math.sqrt(5)) / 2 * (b-a)
   beta = a + (math.sqrt(5) - 1) / 2 * (b-a)
@@ -20,7 +20,7 @@ def golden_ratio(a, b, epsilon=1e-3):
       alpha_next = beta
       beta_next = a + b - beta
     if b - a <= epsilon:
-      return a, (a+b)/2, b
+      return (a + b) / 2
     alpha = alpha_next
     beta = beta_next
 
