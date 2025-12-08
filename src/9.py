@@ -27,37 +27,35 @@ def vector_norm(v1, v2):
   "Норма вектора (евклидова)"
   return math.sqrt((v1[0] - v2[0])**2 + (v1[1] - v2[1])**2)
 
-def cyclic_coordinate_descent(xy, epsilon=0.2):
+def cyclic_coordinate_descent(x0, epsilon=0.2):
   "Метод циклического покоординатного спуска"
   vectors = [[1, 0], [0, 1]]
   iterations = 0
   for _ in range(1000):
-    xy_prev = xy.copy()
+    x0_prev = x0.copy()
     for v in vectors:
-      dx, dy = v[0], v[1]
-
       # phi(alpha) = f(xy + alpha * e_i)
       def phi(alpha):
-        new_x1 = xy[0] + alpha * dx
-        new_x2 = xy[1] + alpha * dy
+        new_x1 = x0[0] + alpha * v[0]
+        new_x2 = x0[1] + alpha * v[1]
         return f(new_x1, new_x2)
 
       # Находим оптимальный шаг alpha
       alpha = golden_ratio(phi, epsilon=epsilon)
-      xy[0] += alpha * dx
-      xy[1] += alpha * dy
+      x0[0] += alpha * v[0]
+      x0[1] += alpha * v[1]
 
     iterations += 1
-    if vector_norm(xy, xy_prev) <= epsilon:
+    if vector_norm(x0, x0_prev) <= epsilon:
       print(f"Сходимость достигнута за {iterations} итераций.")
       break
   else:
     print(f"Достигнуто максимальное число итераций.")
 
-  print(f"Минимум найден в точке: x1 = {xy[0]:.6f}, x2 = {xy[1]:.6f}")
-  print(f"Значение функции: f = {f(xy[0], xy[1]):.6f}")
+  print(f"Минимум найден в точке: x1 = {x0[0]:.6f}, x2 = {x0[1]:.6f}")
+  print(f"Значение функции: f = {f(x0[0], x0[1]):.6f}")
 
 
-# Начальная точка X^0 = (-7, 7)
-cyclic_coordinate_descent([-7.0, 7.0])
+# Начальная точка X^0 = (-7, -7)
+cyclic_coordinate_descent([-7.0, -7.0])
 # Теоретические рассчеты: f(6, 3) = 0
