@@ -5,7 +5,7 @@ x1, x2 = sp.symbols('x1,x2')
 f = (x1 - 2*x2)**2 + (x2 - 3)**2
 f = sp.lambdify((x1, x2), f)
 
-def golden_ratio(f, a=-20.0, b=20.0, epsilon=1e-3):
+def golden_ratio(f, a=-5, b=5, epsilon=0.2):
   "Метод золотого сечения"
   alpha = a + (3 - math.sqrt(5)) / 2 * (b-a)
   beta = a + (math.sqrt(5) - 1) / 2 * (b-a)
@@ -41,7 +41,7 @@ def cyclic_coordinate_descent(x0, epsilon=0.2):
         return f(new_x1, new_x2)
 
       # Находим оптимальный шаг alpha
-      alpha = golden_ratio(phi, epsilon=epsilon)
+      alpha = golden_ratio(phi)
       x0[0] += alpha * v[0]
       x0[1] += alpha * v[1]
 
