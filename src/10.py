@@ -4,47 +4,45 @@ import sympy as sp
 x1, x2, x3 = sp.symbols('x1,x2,x3')
 
 f = 3*x1**2 + 5*x2**2 + 4*x3**2 + 2*x1*x2 - x1*x3 - x2*x3 + 7*x1 + x3
+gradient = sp.Matrix([sp.diff(f, x1), sp.diff(f, x2), sp.diff(f, x3)])
+hessian = sp.hessian(f, (x1, x2, x3))
 
-f_x1 = sp.diff(f, x1)
-f_x1_x1 = sp.diff(f_x1, x1)
-f_x1_x2 = sp.diff(f_x1, x2)
-f_x1_x3 = sp.diff(f_x1, x3)
+print(f)
+print(gradient)
+print(hessian)
 
-f_x2 = sp.diff(f, x2)
-f_x2_x1 = sp.diff(f_x2, x1)
-f_x2_x2 = sp.diff(f_x2, x2)
-f_x2_x3 = sp.diff(f_x2, x3)
+f = sp.lambdify((x1, x2, x3), f)
+gradient = sp.lambdify((x1, x2, x3), gradient)
+hessian = np.array(hessian, dtype=float)
 
-f_x3 = sp.diff(f, x3)
-f_x3_x1 = sp.diff(f_x3, x1)
-f_x3_x2 = sp.diff(f_x3, x2)
-f_x3_x3 = sp.diff(f_x3, x3)
-
-f = sp.lambdify([x1, x2, x3], f, 'math')
-f_x1 = sp.lambdify([x1, x2, x3], f_x1, 'math')
-f_x2 = sp.lambdify([x1, x2, x3], f_x2, 'math')
-f_x3 = sp.lambdify([x1, x2, x3], f_x3, 'math')
+def get_steepest_alpha(g, A):
+  return np.dot(g, g) / np.dot(g, np.dot(A, g))
 
 # ------------------------>
 
 epsilon = 0.01
 N = 10
-# Матрица вторых производных Гессе (Hessian).
-H = np.array([
-  [f_x1_x1, f_x1_x2, f_x1_x3],
-  [f_x2_x1, f_x2_x2, f_x2_x3],
-  [f_x3_x1, f_x3_x2, f_x3_x3],
-])
+X = np.array([-10.0, -10.0, -10.0])
 
-
-def steepest_gradient_descent(a, b):
+def steepest_gradient_descent(X):
   "Метод наискорейшего градиентного спуска"
-  x0 = (a+b)/2
-  k = 0
-  funcs = [f_x1, f_x2, f_x3]
-  tk = 1
-  values = [i(x0, x0, x0) * tk for i in funcs]
+  for iteration in range(1000):
+    current_f = f(*X)
+    current_g = gradient(*X).flatten()
 
-steepest_gradient_descent(-5, 5)
+    print(f"Итерация {iteration}: X={X}, f(X)={current_f}, g(X)={current_g}")
 
-# Шаг = tk
+    if np.linalg.norm(current_g) <= epsilon:
+      print(f"Сходимость достигнута!")
+      print(f"Точка минимума: {X}")
+      print(f"Значение функции: {current_f:.6f}")
+      eigenvalues = np.linalg.eigvals(hessian)
+      min_l, max_l = np.min(eigenvalues), np.max(eigenvalues)
+      print(f"Собственные значения: min={min_l:.2f}, max={max_l:.2f}, отношение={min_l/max_l:.4f}")
+      break
+
+    alpha = get_steepest_alpha(current_g, hessian)
+
+    X -= alpha * current_g
+
+steepest_gradient_descent(X)
